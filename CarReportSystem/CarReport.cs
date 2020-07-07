@@ -7,11 +7,17 @@ using System.Threading.Tasks;
 
 namespace CarReportSystem {
     class CarReport {
+
         public DateTime CreateDate { get; set; }
+
         public string Author { get; set; }
+
         public CarMaker Maker { get; set; }
+
         public string Name { get; set; }
+
         public string Report { get; set; }
+
         public Image Picture { get; set; }
     }
 
