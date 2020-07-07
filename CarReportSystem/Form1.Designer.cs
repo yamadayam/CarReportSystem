@@ -35,7 +35,7 @@
             this.radioButtonSubaru = new System.Windows.Forms.RadioButton();
             this.radioButtonGaisha = new System.Windows.Forms.RadioButton();
             this.radioButtonSonota = new System.Windows.Forms.RadioButton();
-            this.Name = new System.Windows.Forms.ComboBox();
+            this.CarName = new System.Windows.Forms.ComboBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.Report = new System.Windows.Forms.TextBox();
@@ -63,6 +63,7 @@
             this.CreateDate.Name = "CreateDate";
             this.CreateDate.Size = new System.Drawing.Size(200, 19);
             this.CreateDate.TabIndex = 0;
+            this.CreateDate.Value = new System.DateTime(2020, 7, 7, 14, 57, 7, 0);
             // 
             // label1
             // 
@@ -109,7 +110,6 @@
             this.radioButtonToyota.TabStop = true;
             this.radioButtonToyota.Text = "トヨタ";
             this.radioButtonToyota.UseVisualStyleBackColor = true;
-            this.radioButtonToyota.CheckedChanged += new System.EventHandler(this.radioButtonToyota_CheckedChanged);
             // 
             // radioButtonNissan
             // 
@@ -166,13 +166,13 @@
             this.radioButtonSonota.Text = "その他";
             this.radioButtonSonota.UseVisualStyleBackColor = true;
             // 
-            // Name
+            // CarName
             // 
-            this.Name.FormattingEnabled = true;
-            this.Name.Location = new System.Drawing.Point(74, 135);
-            this.Name.Name = "Name";
-            this.Name.Size = new System.Drawing.Size(121, 20);
-            this.Name.TabIndex = 11;
+            this.CarName.FormattingEnabled = true;
+            this.CarName.Location = new System.Drawing.Point(74, 135);
+            this.CarName.Name = "CarName";
+            this.CarName.Size = new System.Drawing.Size(121, 20);
+            this.CarName.TabIndex = 11;
             // 
             // label4
             // 
@@ -202,10 +202,15 @@
             // 
             // dgvCarData
             // 
+            this.dgvCarData.AllowUserToAddRows = false;
+            this.dgvCarData.AllowUserToDeleteRows = false;
             this.dgvCarData.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvCarData.Location = new System.Drawing.Point(78, 387);
+            this.dgvCarData.MultiSelect = false;
             this.dgvCarData.Name = "dgvCarData";
+            this.dgvCarData.ReadOnly = true;
             this.dgvCarData.RowTemplate.Height = 21;
+            this.dgvCarData.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvCarData.Size = new System.Drawing.Size(767, 251);
             this.dgvCarData.TabIndex = 15;
             // 
@@ -226,6 +231,8 @@
             this.btOpen.TabIndex = 17;
             this.btOpen.Text = "開く";
             this.btOpen.UseVisualStyleBackColor = true;
+            this.btOpen.Visible = false;
+            this.btOpen.Click += new System.EventHandler(this.btOpen_Click);
             // 
             // btSave
             // 
@@ -235,6 +242,7 @@
             this.btSave.TabIndex = 18;
             this.btSave.Text = "保存";
             this.btSave.UseVisualStyleBackColor = true;
+            this.btSave.Click += new System.EventHandler(this.btSave_Click);
             // 
             // label8
             // 
@@ -253,15 +261,18 @@
             this.btImageOpen.TabIndex = 21;
             this.btImageOpen.Text = "開く";
             this.btImageOpen.UseVisualStyleBackColor = true;
+            this.btImageOpen.Click += new System.EventHandler(this.btImageOpen_Click);
             // 
             // btImageDelete
             // 
+            this.btImageDelete.Enabled = false;
             this.btImageDelete.Location = new System.Drawing.Point(750, 58);
             this.btImageDelete.Name = "btImageDelete";
             this.btImageDelete.Size = new System.Drawing.Size(75, 23);
             this.btImageDelete.TabIndex = 22;
             this.btImageDelete.Text = "削除";
             this.btImageDelete.UseVisualStyleBackColor = true;
+            this.btImageDelete.Click += new System.EventHandler(this.btImageDelete_Click);
             // 
             // btAdd
             // 
@@ -275,6 +286,7 @@
             // 
             // btFix
             // 
+            this.btFix.Enabled = false;
             this.btFix.Location = new System.Drawing.Point(657, 345);
             this.btFix.Name = "btFix";
             this.btFix.Size = new System.Drawing.Size(75, 23);
@@ -285,12 +297,14 @@
             // 
             // btDelete
             // 
+            this.btDelete.Enabled = false;
             this.btDelete.Location = new System.Drawing.Point(750, 345);
             this.btDelete.Name = "btDelete";
             this.btDelete.Size = new System.Drawing.Size(75, 23);
             this.btDelete.TabIndex = 25;
             this.btDelete.Text = "削除";
             this.btDelete.UseVisualStyleBackColor = true;
+            this.btDelete.Click += new System.EventHandler(this.btDelete_Click);
             // 
             // btEnd
             // 
@@ -300,6 +314,7 @@
             this.btEnd.TabIndex = 26;
             this.btEnd.Text = "終了";
             this.btEnd.UseVisualStyleBackColor = true;
+            this.btEnd.Click += new System.EventHandler(this.btEnd_Click);
             // 
             // Picture
             // 
@@ -347,13 +362,14 @@
             this.Controls.Add(this.Report);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.Name);
+            this.Controls.Add(this.CarName);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.Author);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.CreateDate);
             this.Name = "Form1";
+            this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dgvCarData)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.Picture)).EndInit();
             this.CarGroup.ResumeLayout(false);
@@ -376,7 +392,7 @@
         private System.Windows.Forms.RadioButton radioButtonSubaru;
         private System.Windows.Forms.RadioButton radioButtonGaisha;
         private System.Windows.Forms.RadioButton radioButtonSonota;
-        private System.Windows.Forms.ComboBox Name;
+        private System.Windows.Forms.ComboBox CarName;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox Report;

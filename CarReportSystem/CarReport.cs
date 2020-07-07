@@ -14,7 +14,7 @@ namespace CarReportSystem {
 
         public CarMaker Maker { get; set; }
 
-        public string Name { get; set; }
+        public string CarName { get; set; }
 
         public string Report { get; set; }
 
