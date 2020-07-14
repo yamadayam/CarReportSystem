@@ -6,7 +6,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace CarReportSystem {
-    [Serializable]
     class CarReport {
 
         public DateTime CreateDate { get; set; }

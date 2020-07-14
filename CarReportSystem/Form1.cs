@@ -16,13 +16,13 @@ namespace CarReportSystem {
         BindingList<CarReport> _Cars = new BindingList<CarReport>();
 
         SaveFileDialog saveFile = new SaveFileDialog();
-        OpenFileDialog openFile = new OpenFileDialog();
         public Form1() {
             InitializeComponent();
             dgvCarData.DataSource = _Cars;
         }
 
         private void btAdd_Click(object sender, EventArgs e) {
+
             CarReport obj = new CarReport
             {
                 CreateDate = CreateDate.Value,
@@ -35,7 +35,6 @@ namespace CarReportSystem {
             setComboBoxAutor(Author.Text);
             setComboBoxCarName(CarName.Text);
             _Cars.Insert(0,obj);
-            intDeta();
             radioClear();
             dgvCarData.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
             //次の入力に備えて各項目をクリア
@@ -43,7 +42,6 @@ namespace CarReportSystem {
             initButtons();
             dgvCarData.ClearSelection();
         }
-
         private void inputItemAllClear() {
             Author.Text = "";
             CarName.Text = "";
@@ -51,6 +49,7 @@ namespace CarReportSystem {
             Picture.Image = null;
 
         }
+
         private void initButtons() {
             if (_Cars.Count > 0)
             {
@@ -62,28 +61,6 @@ namespace CarReportSystem {
                 btDelete.Enabled = false;
             }
         }
-        private void intImgButtons() {
-            if (Picture.Image==null)
-            {
-                btImageDelete.Enabled = false;
-            } else
-            {
-                btImageDelete.Enabled = true;
-            }
-        }
-        private void intDeta() {
-            if (_Cars.Count > 0)
-            {
-                btSave.Enabled = true;
-            } else
-            {
-                btSave.Enabled = false;
-            }
-        }
-        private void intOpen() {
-            btOpen.Enabled = true;
-        }
-
         private void setComboBoxAutor(string autor) {
             if (!Author.Items.Contains(autor) )
             {
@@ -143,7 +120,6 @@ namespace CarReportSystem {
             _Cars.RemoveAt(dgvCarData.CurrentRow.Index);
             initButtons();
             inputItemAllClear();
-            intDeta();
             dgvCarData.ClearSelection();
         }
 
@@ -153,32 +129,26 @@ namespace CarReportSystem {
             {
                 Picture.Image = Image.FromFile(openFileDialog.FileName);
                 Picture.SizeMode = PictureBoxSizeMode.StretchImage;
-                intImgButtons();
             }
-            
         }
 
         private void btImageDelete_Click(object sender, EventArgs e) {
-            if (Picture.Image == null)
-                return;
-
-            if (MessageBox.Show("削除してよいですか？", "確認", MessageBoxButtons.OKCancel, MessageBoxIcon.Question)==DialogResult.OK)
-            {
-                Picture.Image = null;
-            }
+            Picture.Image = null;            
         }
 
         private void btEnd_Click(object sender, EventArgs e) {
             Application.Exit();
         }
 
-        
+        private void Form1_Load(object sender, EventArgs e) {
+
+        }
 
         private void btSave_Click(object sender, EventArgs e) {
             if (saveFile.ShowDialog()==DialogResult.OK)
             {
                 BinaryFormatter formatter = new BinaryFormatter();
-                
+
                 using (FileStream fs=new FileStream(saveFile.FileName, FileMode.Create))
                 {
                     try
@@ -191,14 +161,12 @@ namespace CarReportSystem {
                         throw;
                     }
                 }
-                intOpen();
             }
         }
 
         private void btOpen_Click(object sender, EventArgs e) {
-            if (openFile.ShowDialog() == DialogResult.OK)
+            if (ShowDialog() == DialogResult.OK)
             {
-                
                 using (FileStream fs = new FileStream(saveFile.FileName, FileMode.Open))
                 {
                     try
@@ -219,18 +187,22 @@ namespace CarReportSystem {
                 }
             }
         }
+
+        
         private void dgvCarData_Click(object sender, EventArgs e) {
             if (dgvCarData.CurrentRow == null)
                 return;
+
             //選択したレコードを取り出す
             //データグリッドビューで選択した行のインデックスを元に
             //BindingListのデータを取得する
             CarReport selectedCar = _Cars[dgvCarData.CurrentRow.Index];
-            CreateDate.Value = selectedCar.CreateDate;
+            CreateDate.Text = selectedCar.CreateDate.ToString();
             Author.Text = selectedCar.Author;
             CarName.Text = selectedCar.CarName;
             Report.Text = selectedCar.Report;
             Picture.Image = selectedCar.Picture;
+
         }
     }
 }
