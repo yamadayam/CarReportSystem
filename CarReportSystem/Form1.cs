@@ -14,11 +14,11 @@ using System.Windows.Forms;
 namespace CarReportSystem {
     public partial class Form1 : Form {
         BindingList<CarReport> _Cars = new BindingList<CarReport>();
-
         SaveFileDialog saveFile = new SaveFileDialog();
+        OpenFileDialog openFile = new OpenFileDialog();
         public Form1() {
             InitializeComponent();
-            dgvCarData.DataSource = _Cars;
+            //dgvCarData.DataSource = _Cars;
         }
 
         private void btAdd_Click(object sender, EventArgs e) {
@@ -133,7 +133,7 @@ namespace CarReportSystem {
         }
 
         private void btImageDelete_Click(object sender, EventArgs e) {
-            Picture.Image = null;            
+            Picture.Image = null;
         }
 
         private void btEnd_Click(object sender, EventArgs e) {
@@ -141,6 +141,9 @@ namespace CarReportSystem {
         }
 
         private void Form1_Load(object sender, EventArgs e) {
+            // TODO: このコード行はデータを 'infosys202014DataSet.CarReport' テーブルに読み込みます。必要に応じて移動、または削除をしてください。
+            this.carReportTableAdapter.Fill(this.infosys202014DataSet.CarReport);
+            dgvCarData.Columns[0].Visible = false;
 
         }
 
@@ -158,51 +161,59 @@ namespace CarReportSystem {
                     catch (SerializationException se)
                     {
                         Console.WriteLine("Failed to serialize. Reason: " + se.Message);
-                        throw;
+                        
                     }
                 }
             }
         }
 
         private void btOpen_Click(object sender, EventArgs e) {
-            if (ShowDialog() == DialogResult.OK)
-            {
-                using (FileStream fs = new FileStream(saveFile.FileName, FileMode.Open))
-                {
-                    try
-                    {
-                        BinaryFormatter formatter = new BinaryFormatter();
-                        //逆シリアル化して読み込む
-                        _Cars = (BindingList<CarReport>)formatter.Deserialize(fs);
-                        //データグリッドビューに再設定
-                        dgvCarData.DataSource = _Cars;
-                        //選択されている箇所を各コントロールへ表示
-                        dgvCarData_Click(sender, e);
-                    }
-                    catch (SerializationException se)
-                    {
-                        Console.WriteLine("Failed to deserialize. Reason: " + se.Message);
-                        throw;
-                    }
-                }
-            }
+            //if (openFile.ShowDialog() == DialogResult.OK)
+            //{
+            //    using (FileStream fs = new FileStream(saveFile.FileName, FileMode.Open))
+            //    {
+            //        try
+            //        {
+            //            BinaryFormatter formatter = new BinaryFormatter();
+            //            //逆シリアル化して読み込む
+            //            _Cars = (BindingList<CarReport>)formatter.Deserialize(fs);
+            //            //データグリッドビューに再設定
+            //            dgvCarData.DataSource = _Cars;
+            //            //選択されている箇所を各コントロールへ表示
+            //            dgvCarData_Click(sender, e);
+            //        }
+            //        catch (SerializationException se)
+            //        {
+            //            Console.WriteLine("Failed to deserialize. Reason: " + se.Message);
+            //            throw;
+            //        }
+            //    }
+            //}
+            //this.carReportTableAdapter.Fill(this.infosys202014DataSet.CarReport);
         }
 
         
         private void dgvCarData_Click(object sender, EventArgs e) {
-            if (dgvCarData.CurrentRow == null)
-                return;
+            var test = dgvCarData.CurrentRow.Cells[2].Value;
+            //if (dgvCarData.CurrentRow == null)
+            //    return;
+            ////選択したレコードを取り出す
+            ////データグリッドビューで選択した行のインデックスを元に
+            ////BindingListのデータを取得する
+            //CarReport selectedCar = _Cars[dgvCarData.CurrentRow.Index];
+            //CreateDate.Text = selectedCar.CreateDate.ToString();
+            //Author.Text = selectedCar.Author;
+            //CarName.Text = selectedCar.CarName;
+            //Report.Text = selectedCar.Report;
+            //Picture.Image = selectedCar.Picture;
+        }
 
-            //選択したレコードを取り出す
-            //データグリッドビューで選択した行のインデックスを元に
-            //BindingListのデータを取得する
-            CarReport selectedCar = _Cars[dgvCarData.CurrentRow.Index];
-            CreateDate.Text = selectedCar.CreateDate.ToString();
-            Author.Text = selectedCar.Author;
-            CarName.Text = selectedCar.CarName;
-            Report.Text = selectedCar.Report;
-            Picture.Image = selectedCar.Picture;
+        private void carReportBindingNavigatorSaveItem_Click(object sender, EventArgs e) {
+            this.Validate();
+            this.carReportBindingSource.EndEdit();
+            this.tableAdapterManager.UpdateAll(this.infosys202014DataSet);
 
         }
+
     }
 }
