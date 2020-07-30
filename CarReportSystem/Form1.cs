@@ -12,34 +12,23 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace CarReportSystem {
-    public partial class Form1 : Form {
+    public partial class pbImage : Form {
         BindingList<CarReport> _Cars = new BindingList<CarReport>();
         SaveFileDialog saveFile = new SaveFileDialog();
         OpenFileDialog openFile = new OpenFileDialog();
-        public Form1() {
+        public pbImage() {
             InitializeComponent();
             //dgvCarData.DataSource = _Cars;
         }
 
         private void btAdd_Click(object sender, EventArgs e) {
 
-            CarReport obj = new CarReport
-            {
-                CreateDate = CreateDate.Value,
-                Author = Author.Text,
-                Maker = radiobt(),
-                CarName = CarName.Text,
-                Report = Report.Text,
-                Picture = Picture.Image
-            };
-            setComboBoxAutor(Author.Text);
-            setComboBoxCarName(CarName.Text);
-            _Cars.Insert(0,obj);
-            radioClear();
-            dgvCarData.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            this.Validate();
+            this.carReportBindingSource.EndEdit();
+            this.tableAdapterManager.UpdateAll(this.infosys202014DataSet);
             //次の入力に備えて各項目をクリア
-            inputItemAllClear();
-            initButtons();
+
+            //initButtons();
             dgvCarData.ClearSelection();
         }
         private void inputItemAllClear() {
@@ -104,23 +93,48 @@ namespace CarReportSystem {
             radioButtonNissan.Checked = false;
         }
         private void btFix_Click(object sender, EventArgs e) {
-            CarReport selectedCar = _Cars[dgvCarData.CurrentRow.Index];
-            
-            selectedCar.CreateDate = CreateDate.Value;
-            selectedCar.Author = Author.Text;
-            selectedCar.Maker = radiobt();
-            selectedCar.CarName = CarName.Text;
-            selectedCar.Report = Report.Text;
-            selectedCar.Picture = Picture.Image;
-            
-            dgvCarData.Refresh();
+            dgvCarData.CurrentRow.Cells[1].Value = CreateDate.Value;
+            dgvCarData.CurrentRow.Cells[2].Value = Author.Text;
+            serch();
+            dgvCarData.CurrentRow.Cells[4].Value = CarName.Text;
+            dgvCarData.CurrentRow.Cells[5].Value = Report.Text;
+            if (Picture.Image == null)
+            {
+                dgvCarData.CurrentRow.Cells[6].Value = null;
+            } else
+            {
+                dgvCarData.CurrentRow.Cells[6].Value = ImageToByteArray(Picture.Image);
+            }
+
+            //データベース更新（反映）
+            this.Validate();
+            this.carReportBindingSource.EndEdit();
+            this.tableAdapterManager.UpdateAll(this.infosys202014DataSet);
+        }
+        public void serch() {
+            if (radioButtonToyota.Checked==true)
+            {
+                dgvCarData.CurrentRow.Cells[3].Value = "トヨタ";
+            } else if (radioButtonSubaru.Checked==true)
+            {
+                dgvCarData.CurrentRow.Cells[3].Value = "スバル";
+            } else if (radioButtonNissan.Checked==true)
+            {
+                dgvCarData.CurrentRow.Cells[3].Value = "日産";
+            } else if (radioButtonHonda.Checked==true)
+            {
+                dgvCarData.CurrentRow.Cells[3].Value = "ホンダ";
+            } else if (radioButtonGaisha.Checked==true)
+            {
+                dgvCarData.CurrentRow.Cells[3].Value = "外車";
+            } else
+            {
+                dgvCarData.CurrentRow.Cells[3].Value = "その他";
+            }
         }
 
         private void btDelete_Click(object sender, EventArgs e) {
-            _Cars.RemoveAt(dgvCarData.CurrentRow.Index);
-            initButtons();
-            inputItemAllClear();
-            dgvCarData.ClearSelection();
+            
         }
 
         private void btImageOpen_Click(object sender, EventArgs e) {
@@ -133,7 +147,11 @@ namespace CarReportSystem {
         }
 
         private void btImageDelete_Click(object sender, EventArgs e) {
-            Picture.Image = null;
+            if (Picture.Image != null)
+            {
+                Picture.Image.Dispose();
+                Picture.Image = null;
+            }
         }
 
         private void btEnd_Click(object sender, EventArgs e) {
@@ -142,7 +160,7 @@ namespace CarReportSystem {
 
         private void Form1_Load(object sender, EventArgs e) {
             // TODO: このコード行はデータを 'infosys202014DataSet.CarReport' テーブルに読み込みます。必要に応じて移動、または削除をしてください。
-            this.carReportTableAdapter.Fill(this.infosys202014DataSet.CarReport);
+            //this.carReportTableAdapter.Fill(this.infosys202014DataSet.CarReport);
             dgvCarData.Columns[0].Visible = false;
 
         }
@@ -168,52 +186,102 @@ namespace CarReportSystem {
         }
 
         private void btOpen_Click(object sender, EventArgs e) {
-            //if (openFile.ShowDialog() == DialogResult.OK)
-            //{
-            //    using (FileStream fs = new FileStream(saveFile.FileName, FileMode.Open))
-            //    {
-            //        try
-            //        {
-            //            BinaryFormatter formatter = new BinaryFormatter();
-            //            //逆シリアル化して読み込む
-            //            _Cars = (BindingList<CarReport>)formatter.Deserialize(fs);
-            //            //データグリッドビューに再設定
-            //            dgvCarData.DataSource = _Cars;
-            //            //選択されている箇所を各コントロールへ表示
-            //            dgvCarData_Click(sender, e);
-            //        }
-            //        catch (SerializationException se)
-            //        {
-            //            Console.WriteLine("Failed to deserialize. Reason: " + se.Message);
-            //            throw;
-            //        }
-            //    }
-            //}
-            //this.carReportTableAdapter.Fill(this.infosys202014DataSet.CarReport);
+            this.carReportTableAdapter.Fill(this.infosys202014DataSet.CarReport);
+            dgvCarData.Columns[0].Visible = false;
         }
 
         
         private void dgvCarData_Click(object sender, EventArgs e) {
-            var test = dgvCarData.CurrentRow.Cells[2].Value;
-            //if (dgvCarData.CurrentRow == null)
-            //    return;
-            ////選択したレコードを取り出す
-            ////データグリッドビューで選択した行のインデックスを元に
-            ////BindingListのデータを取得する
-            //CarReport selectedCar = _Cars[dgvCarData.CurrentRow.Index];
-            //CreateDate.Text = selectedCar.CreateDate.ToString();
-            //Author.Text = selectedCar.Author;
-            //CarName.Text = selectedCar.CarName;
-            //Report.Text = selectedCar.Report;
-            //Picture.Image = selectedCar.Picture;
+            //var test = dgvCarData.CurrentRow.Cells[4].Value;
+            if (dgvCarData.CurrentRow.Cells[4].Value.ToString()=="トヨタ")
+            {
+                radioButtonToyota.Checked = true;
+            }
         }
 
         private void carReportBindingNavigatorSaveItem_Click(object sender, EventArgs e) {
+            dgvCarData.CurrentRow.Cells[2].Value = Author.Text;
+
+            //データベース更新（反映）
             this.Validate();
             this.carReportBindingSource.EndEdit();
             this.tableAdapterManager.UpdateAll(this.infosys202014DataSet);
 
         }
 
+        private void dgvCarData_Click_1(object sender, EventArgs e) {
+            CreateDate.Value = (DateTime)dgvCarData.CurrentRow.Cells[1].Value;
+            Author.Text = dgvCarData.CurrentRow.Cells[2].Value.ToString();
+            string maker = dgvCarData.CurrentRow.Cells[3].Value.ToString();
+            setMakerButtonSet((string)maker);
+            CarName.Text = dgvCarData.CurrentRow.Cells[4].Value.ToString();
+            Report.Text = dgvCarData.CurrentRow.Cells[5].Value.ToString();
+            try
+            {
+                if (dgvCarData.CurrentRow.Cells[6].Value != null)
+                {
+                    Picture.Image = ByteArrayToImage((byte[])dgvCarData.CurrentRow.Cells[6].Value);
+                }                
+            }
+            catch (InvalidCastException)
+            {
+                Picture.Image = null;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+        }
+        private void setMakerButtonSet(string maker) {
+            switch (maker)
+            {
+                case "トヨタ":
+                    radioButtonToyota.Checked = true;
+                    break;
+                case "日産":
+                    radioButtonNissan.Checked = true;
+                    break;
+                case "ホンダ":
+                    radioButtonHonda.Checked = true;
+                    break;
+                case "スバル":
+                    radioButtonSubaru.Checked = true;
+                    break;
+                case "外車":
+                    radioButtonGaisha.Checked = true;
+                    break;
+                default:
+                    radioButtonSonota.Checked = true;
+                    break;
+            }
+        }
+
+        // バイト配列をImageオブジェクトに変換
+        public static Image ByteArrayToImage(byte[] byteData) {
+            ImageConverter imgconv = new ImageConverter();
+            Image img = (Image)imgconv.ConvertFrom(byteData);
+            return img;
+        }
+
+        // Imageオブジェクトをバイト配列に変換
+        public static byte[] ImageToByteArray(Image img) {
+            ImageConverter imgconv = new ImageConverter();
+            byte[] byteData = (byte[])imgconv.ConvertTo(img, typeof(byte[]));
+            return byteData;
+        }
+
+        private void btSearchExe_Click(object sender, EventArgs e) {
+            
+            if (tbSearchCarMaker.Text=="" && tbSearchCarName.Text=="")
+            {
+                this.carReportTableAdapter.FillByCarDateCar(this.infosys202014DataSet.CarReport,
+                    tbSearchCarDate.Text);
+            } else
+            {
+                this.carReportTableAdapter.FillByCarMakerName(this.infosys202014DataSet.CarReport,
+                    tbSearchCarMaker.Text, tbSearchCarName.Text);
+            }
+        }
     }
 }
